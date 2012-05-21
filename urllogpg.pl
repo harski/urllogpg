@@ -34,9 +34,10 @@ $VERSION = "0.1";
 
 sub log_urls {
     my ($server, $line, $nick, $channel) = @_;
-    while ($line =~ m/((?:https?|ftp):\/\/\S+\.\S+)/i) {
-        insert($nick, $channel, $1, "");
+    if ($line =~ m/((?:https?|ftp):\/\/\S+\.\S+)/i) {
+        return insert($nick, $channel, $1, "");
     }
+    return 0;
 }
 
 
@@ -58,6 +59,7 @@ sub insert {
     my $query = "INSERT INTO links VALUES (DEFAULT,". $dbh->quote($channel) . ", LOCALTIMESTAMP," . $dbh->quote($nick) . "," . $dbh->quote($url) . ", DEFAULT)";
     my $sth = $dbh->do($query);
     $dbh->disconnect();
+    return 1;
 }
 
 
