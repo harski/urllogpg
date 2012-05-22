@@ -34,10 +34,10 @@ $VERSION = "0.1";
 
 sub log_urls {
     my ($server, $line, $nick, $channel) = @_;
-    if ($line =~ m/((?:https?|ftp):\/\/\S+\.\S+)/i) {
-        return insert($nick, $channel, $1, "");
+    while ($line =~ m/((?:https?|ftp):\/\/\S+\.\S+)/ig) {
+        insert($nick, $channel, $1, "");
     }
-    return 0;
+    return 1;
 }
 
 
