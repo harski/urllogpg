@@ -89,6 +89,12 @@ sub own_msg {
 }
 
 
+sub topic_msg {
+	my ($server, $channel, $topic, $nick, $mask) = @_;
+	return log_urls($server, $topic, $nick, $channel);
+}
+
+
 sub insert {
     my ($nick, $channel, $url, $title)=@_;
     my $dbh = DBI->connect($dbd, $username, $password) or die("Cannot connect: " . $DBI::errstr);
@@ -101,6 +107,6 @@ sub insert {
 
 Irssi::signal_add_last('message public', 'chan_msg');
 Irssi::signal_add_last('message own_public', 'own_msg');
-#Irssi::signal_add_last('message topic', 'topic_msg');
+Irssi::signal_add_last('message topic', 'topic_msg');
 
 Irssi::print("Urllogpl loaded.");
