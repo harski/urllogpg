@@ -69,7 +69,7 @@ $VERSION = "0.1";
 
 
 sub log_urls {
-    my ($server, $line, $nick, $channel) = @_;
+    my ($line, $nick, $channel) = @_;
     while ($line =~ m/((?:https?|ftp):\/\/\S+\.\S+)/ig) {
         insert($nick, $channel, $1, "");
     }
@@ -79,19 +79,19 @@ sub log_urls {
 
 sub chan_msg {
     my ($server, $line, $nick, $mask, $channel) = @_;
-    return log_urls($server, $line, $nick, $channel);
+    return log_urls($line, $nick, $channel);
 }
 
 
 sub own_msg {
-    my ($server, $line, $target) = @_;
-    return log_urls($server, $line, $server->{nick}, $target);
+    my ($server, $line, $channel) = @_;
+    return log_urls($line, $server->{nick}, $channel);
 }
 
 
 sub topic_msg {
 	my ($server, $channel, $topic, $nick, $mask) = @_;
-	return log_urls($server, $topic, $nick, $channel);
+	return log_urls($topic, $nick, $channel);
 }
 
 
