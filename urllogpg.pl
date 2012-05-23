@@ -28,15 +28,21 @@
 # official policies, either expressed or implied, of the FreeBSD
 # Project.
 
-#                                    Table "public.links"
-# Column  |            Type             |                     Modifiers
-#---------+-----------------------------+---------------------------------------------------
-# id      | integer                     | not null default nextval('links_id_seq'::regclass)
-# channel | text                        | not null
-# time    | timestamp without time zone |
-# nick    | text                        | not null
-# link    | text                        | not null
-# title   | text                        |
+
+# This is more or less what your table should look like. The title column is
+# not used with this release directly, but it is a planned feature. Also note,
+# that the id column is expected to be auto incremented by some sequence (here
+# links_id_seq).
+#
+#                 Table "public.links"
+# Column  |     Type   |                     Modifiers
+#---------+------------+---------------------------------------------------
+# id      | integer    | not null default nextval('links_id_seq'::regclass)
+# channel | text       | not null
+# time    | timestamp  |
+# nick    | text       | not null
+# link    | text       | not null
+# title   | text       |
 
 use DBI;
 use Irssi;
