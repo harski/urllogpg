@@ -58,7 +58,7 @@ my $password = "";
 my $dbd = "DBI:Pg:dbname=" . $dbname; 
 use vars qw($VERSION %IRSSI);
 
-$VERSION = "0.1";
+$VERSION = "0.2";
 %IRSSI = (
         authors     => "Tuomo Hartikainen",
         contact     => "hartitu\@gmail.com",
@@ -111,12 +111,15 @@ sub topic_msg {
 sub insert {
     my ($nick, $channel, $url, $title)=@_;
 
+    my $dbh = DBI->connect($dbd, $username, $password) or die("Cannot connect: " . $DBI::errstr);
+    my $query = "INSERT INTO links VALUES (DEFAULT,". $dbh->quote($channel) . ", LOCALTIMESTAMP," . $dbh->quote($nick) . "," . $dbh->quote($url) . ", ";
+
     if(length $title == 0) {
-        $title = "DEFAULT";
+        $query .= "DEFAULT)";
+    } else {
+        $query .= "\'" . $title . "\')";
     }
 
-    my $dbh = DBI->connect($dbd, $username, $password) or die("Cannot connect: " . $DBI::errstr);
-    my $query = "INSERT INTO links VALUES (DEFAULT,". $dbh->quote($channel) . ", LOCALTIMESTAMP," . $dbh->quote($nick) . "," . $dbh->quote($url) . ", \'" . $title . "\')";
     my $sth = $dbh->do($query);
     $dbh->disconnect();
     return 1;
