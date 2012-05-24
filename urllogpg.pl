@@ -47,6 +47,7 @@
 use DBI;
 use Irssi;
 use Irssi::Irc;
+use LWP::Simple;
 
 use strict;
 
@@ -68,10 +69,22 @@ $VERSION = "0.1";
     );
 
 
+sub get_title {
+    my ($url) = @_;
+    my $content = get($url) or return "";
+
+    if($content =~ m/<title>(.*)<\/title>/i) {
+        return $1;
+    }
+    return "";
+}
+
+
 sub log_urls {
     my ($line, $nick, $channel) = @_;
     while ($line =~ m/((?:https?|ftp):\/\/\S+\.\S+)/ig) {
-        insert($nick, $channel, $1, "");
+        my $title = get_title($1);
+        insert($nick, $channel, $1, $title);
     }
     return 1;
 }
@@ -97,8 +110,13 @@ sub topic_msg {
 
 sub insert {
     my ($nick, $channel, $url, $title)=@_;
+
+    if(length $title == 0) {
+        $title = "DEFAULT";
+    }
+
     my $dbh = DBI->connect($dbd, $username, $password) or die("Cannot connect: " . $DBI::errstr);
-    my $query = "INSERT INTO links VALUES (DEFAULT,". $dbh->quote($channel) . ", LOCALTIMESTAMP," . $dbh->quote($nick) . "," . $dbh->quote($url) . ", DEFAULT)";
+    my $query = "INSERT INTO links VALUES (DEFAULT,". $dbh->quote($channel) . ", LOCALTIMESTAMP," . $dbh->quote($nick) . "," . $dbh->quote($url) . ", \'" . $title . "\')";
     my $sth = $dbh->do($query);
     $dbh->disconnect();
     return 1;
