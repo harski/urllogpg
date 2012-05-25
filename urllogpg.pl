@@ -117,7 +117,7 @@ sub insert {
     if(length $title == 0) {
         $query .= "DEFAULT)";
     } else {
-        $query .= "\'" . $title . "\')";
+        $query .= $dbh->quote($title) . ")";
     }
 
     my $sth = $dbh->do($query);
