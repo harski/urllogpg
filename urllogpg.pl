@@ -51,9 +51,12 @@ use LWP::Simple;
 
 use strict;
 
+# Settings
 my $dbname = "";
 my $username = "";
 my $password = "";
+
+my $fetch_title = 0;
 
 my $dbd = "DBI:Pg:dbname=" . $dbname; 
 use vars qw($VERSION %IRSSI);
@@ -83,7 +86,10 @@ sub get_title {
 sub log_urls {
     my ($line, $nick, $channel) = @_;
     while ($line =~ m/((?:https?|ftp):\/\/\S+\.\S+)/ig) {
-        my $title = get_title($1);
+        my $title = "";
+        if ($fetch_title) {
+            $title = get_title($1);
+        }
         insert($nick, $channel, $1, $title);
     }
     return 1;
