@@ -61,7 +61,7 @@ my $fetch_title = 0;
 my $dbd = "DBI:Pg:dbname=" . $dbname; 
 use vars qw($VERSION %IRSSI);
 
-$VERSION = "0.2";
+$VERSION = "0.3";
 %IRSSI = (
         authors     => "Tuomo Hartikainen",
         contact     => "hartitu\@gmail.com",
@@ -74,19 +74,19 @@ $VERSION = "0.2";
 
 sub get_title {
     my ($url) = @_;
-    my $content = get($url) or return "";
+    my $content = get($url) or return undef;
 
     if($content =~ m/<title>(.*)<\/title>/i) {
         return $1;
     }
-    return "";
+    return undef;
 }
 
 
 sub log_urls {
     my ($line, $nick, $channel) = @_;
-    while ($line =~ m/((?:https?|ftp):\/\/\S+\.\S+)/ig) {
-        my $title = "";
+    while ($line =~ m/((?:ftp|http)s?:\/\/[\-a-zA-Z0-9\.\?\$%&\/\)\(=_~#\.,:;\+]+)/g) {
+        my $title;
         if ($fetch_title) {
             $title = get_title($1);
         }
@@ -120,10 +120,10 @@ sub insert {
     my $dbh = DBI->connect($dbd, $username, $password) or die("Cannot connect: " . $DBI::errstr);
     my $query = "INSERT INTO links VALUES (DEFAULT,". $dbh->quote($channel) . ", LOCALTIMESTAMP," . $dbh->quote($nick) . "," . $dbh->quote($url) . ", ";
 
-    if(length $title == 0) {
-        $query .= "DEFAULT)";
-    } else {
+    if(defined $title) {
         $query .= $dbh->quote($title) . ")";
+    } else {
+        $query .= "DEFAULT)";
     }
 
     my $sth = $dbh->do($query);
