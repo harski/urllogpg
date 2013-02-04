@@ -1,47 +1,5 @@
-# Copyright (c) 2012, Tuomo Hartikainen All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are
-# met:
-#
-# 1. Redistributions of source code must retain the above copyright
-#	notice, this list of conditions and the following disclaimer.
-#
-# 2. Redistributions in binary form must reproduce the above copyright
-#	notice, this list of conditions and the following disclaimer in the
-#	documentation and/or other materials provided with the distribution.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-# The views and conclusions contained in the software and documentation
-# are those of the authors and should not be interpreted as representing
-# official policies, either expressed or implied, of the FreeBSD
-# Project.
-
-
-# This is more or less what your table should look like. Note that the
-# id column is expected to be auto incremented by some sequence (here
-# links_id_seq).
-#
-#                Table "public.links"
-# Column  | Type      |         Modifiers
-#---------+-----------+------------------------------------------
-# id      | integer   | not null default nextval('links_id_seq'::regclass)
-# channel | text      | not null
-# time    | timestamp |
-# nick    | text      | not null
-# link    | text      | not null
-# title   | text      |
+# Copyright (c) 2012, Tuomo Hartikainen. All rights reserved.
+# Licensed under BSD 2-clause license. See LICENSE for details.
 
 use DBI;
 use Irssi;
@@ -57,6 +15,8 @@ my $password = "";
 
 # Set this to non-zero to enable fetching titles
 my $fetch_title = 0;
+
+my $link_regex = "((?:ftp|http)s?:\/\/[\-a-zA-Z0-9\.\?\$%&\/\)\(=_~#\.,:;\+]+)";
 
 my $dbd = "DBI:Pg:dbname=" . $dbname;
 use vars qw($VERSION %IRSSI);
@@ -83,7 +43,7 @@ sub get_title {
 
 sub log_urls {
 	my ($line, $nick, $channel) = @_;
-	while ($line =~ m/((?:ftp|http)s?:\/\/[\-a-zA-Z0-9\.\?\$%&\/\)\(=_~#\.,:;\+]+)/g) {
+	while ($line =~ m/$link_regex/g) {
 		my $title;
 		if ($fetch_title) {
 			my $pid = fork();
